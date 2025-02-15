@@ -11,7 +11,7 @@ class CompanyList extends StatelessWidget {
     var appState = context.watch<MyAppState>();
 
     // When there are no companies we let the user know
-    if (appState.companies.isEmpty){
+    if (appState.noCompaniesAdded()){
       return Center(
         child : Text('No companies yet...'),
       );
@@ -19,15 +19,31 @@ class CompanyList extends StatelessWidget {
 
     // Otherwise we iterate through the list of companies
     // and display each of them as list widgets using map
-    return ListView(
-      children : 
-        appState.companies
-          .map(
-            (company) => ListTile(
-              title : Text(company),
-            )
-          )
-          .toList()
+    // return ListView(
+    //   children : 
+    //     appState.companies
+    //       .map(
+    //         (company) => ListTile(
+    //           title : Text(company),
+    //         )
+    //       )
+    //       .toList()
+    // );
+
+    // Creates a list of deletable components based on the company names in the ilst
+    return ListView.builder(
+      itemCount : appState.numberOfCompanies,
+      itemBuilder: (context, index) {
+        return Card(
+            child : ListTile(
+              title : Text(appState.getIthCompany(index)),
+              trailing : IconButton(
+                icon : Icon(Icons.delete, color : Colors.red),
+                onPressed : () => appState.removeIthCompany(index),
+              ),
+            ),
+        );
+      }
     );
   }
   

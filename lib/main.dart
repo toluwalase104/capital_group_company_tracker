@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,21 +39,71 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  Set<String> companies = {};
+  List<String> _companyNames = [];
+
+  // Used for fast presence checking to avoid duplicate entries
+  HashSet<String> _seenCompanies = HashSet<String>();
   
+  int _numberOfCompanies = 0;
+  get numberOfCompanies => _numberOfCompanies;
+
   // Add a company to the company set and
   // update anything watching this notifier
   void addCompany(String company){
-    companies.add(company);
+    // Do not allow duplicate entries
+    if (_seenCompanies.contains(company)){
+      return;
+    }
+
+    _companyNames.add(company);
+    _seenCompanies.add(company);
+    ++_numberOfCompanies;
+
     notifyListeners();
   }
 
   // Remove a company from the company set and
   // update anything watching this notifier
   void removeCompany(String company){
-    companies.remove(company);
+
+    // Cannot remove non-existent items, so we cease further operations
+    if (!_seenCompanies.contains(company)){
+      return;
+    }
+
+    _companyNames.remove(company);
+    _seenCompanies.remove(company);
+    --_numberOfCompanies;
+
     notifyListeners();
   }
+
+  void removeIthCompany(int i){
+    if (i < 0 || i >= _numberOfCompanies){
+      return;
+    }
+
+    String companyToBeRemoved = _companyNames[i];
+
+    _seenCompanies.remove(companyToBeRemoved);
+    _companyNames.removeAt(i);
+    --_numberOfCompanies;
+
+    notifyListeners();
+  }
+
+  String getIthCompany(int i){
+    if (i < 0 || i >= _numberOfCompanies){
+      return "";
+    }
+
+    return _companyNames[i];
+  }
+
+  bool noCompaniesAdded(){
+    return _companyNames.isEmpty;
+  }
+
 }
 
 class HomePage extends StatelessWidget {
