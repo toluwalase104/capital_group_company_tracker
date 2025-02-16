@@ -57,12 +57,11 @@ class _CompanyInputFormState extends State<CompanyInputForm> {
                 return;
               }
 
-              // Otherwise if valid show a snackbar (replace this with database storage code)
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content : Text(formController.text)),
-              );
-
+              // Otherwise if valid then add the given company to the list
               appState.addCompany(formController.text);
+
+              // Clear the text in the form after it has been submitted
+              formController.clear();
             },
             child : const Text('Submit'),
           ),

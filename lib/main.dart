@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:company_interest_tracker/company_data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,9 +42,8 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   List<String> _companyNames = [];
 
-  // Used for fast presence checking to avoid duplicate entries
-  HashSet<String> _seenCompanies = HashSet<String>();
-  
+  HashMap<String, CompanyData> _companyMap = HashMap<String, CompanyData>();
+
   int _numberOfCompanies = 0;
   get numberOfCompanies => _numberOfCompanies;
 
@@ -51,12 +51,13 @@ class MyAppState extends ChangeNotifier {
   // update anything watching this notifier
   void addCompany(String company){
     // Do not allow duplicate entries
-    if (_seenCompanies.contains(company)){
+    if (_companyMap.containsKey(company)){
       return;
     }
 
     _companyNames.add(company);
-    _seenCompanies.add(company);
+    _companyMap.putIfAbsent(company, () => CompanyData(company));
+
     ++_numberOfCompanies;
 
     notifyListeners();
@@ -67,12 +68,12 @@ class MyAppState extends ChangeNotifier {
   void removeCompany(String company){
 
     // Cannot remove non-existent items, so we cease further operations
-    if (!_seenCompanies.contains(company)){
+    if (!_companyMap.containsKey(company)){
       return;
     }
 
     _companyNames.remove(company);
-    _seenCompanies.remove(company);
+    _companyMap.remove(company);
     --_numberOfCompanies;
 
     notifyListeners();
@@ -85,7 +86,7 @@ class MyAppState extends ChangeNotifier {
 
     String companyToBeRemoved = _companyNames[i];
 
-    _seenCompanies.remove(companyToBeRemoved);
+    _companyMap.remove(companyToBeRemoved);
     _companyNames.removeAt(i);
     --_numberOfCompanies;
 
@@ -119,9 +120,7 @@ class HomePage extends StatelessWidget {
             body : Column(
               children: [
                 const CompanyInputForm(),
-                const SizedBox(
-                  width: 200,
-                  height: 200,
+                const Expanded(
                   child: CompanyList()
                 ),
               ],
