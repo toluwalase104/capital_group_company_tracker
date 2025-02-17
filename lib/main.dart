@@ -51,14 +51,16 @@ class MyAppState extends ChangeNotifier {
 
   // Add a company to the company set and
   // update anything watching this notifier
-  void addCompany(String company){
+  void addCompany(String companyName){
+    companyName = companyName;
+
     // Do not allow duplicate entries
-    if (_companyMap.containsKey(company)){
+    if (_companyMap.containsKey(companyName)){
       return;
     }
 
-    _companyNames.add(company);
-    _companyMap.putIfAbsent(company, () => CompanyData(_numberOfCompanies, company));
+    _companyNames.add(companyName);
+    _companyMap.putIfAbsent(companyName, () => CompanyData(_numberOfCompanies, companyName));
 
     ++_numberOfCompanies;
 
@@ -67,15 +69,16 @@ class MyAppState extends ChangeNotifier {
 
   // Remove a company from the company set and
   // update anything watching this notifier
-  void removeCompany(String company){
+  void removeCompany(String companyName){
+    companyName = companyName;
 
     // Cannot remove non-existent items, so we cease further operations
-    if (!_companyMap.containsKey(company)){
+    if (!_companyMap.containsKey(companyName)){
       return;
     }
 
-    _companyNames.remove(company);
-    _companyMap.remove(company);
+    _companyNames.remove(companyName);
+    _companyMap.remove(companyName);
     --_numberOfCompanies;
 
     notifyListeners();
@@ -108,6 +111,8 @@ class MyAppState extends ChangeNotifier {
   }
 
   CompanyData? getCompanyData(String companyName){
+    companyName = companyName;
+
     return _companyMap[companyName];
   }
 
@@ -115,7 +120,8 @@ class MyAppState extends ChangeNotifier {
     if (index < 0 || index >= numberOfCompanies){
       return;
     }
-  
+    companyName = companyName;
+
     String previousName = _companyNames[index];
 
     // We establish the new company's data potentially
@@ -180,7 +186,7 @@ class HomePage extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(32.0),
-                  child: FloatingActionButton(
+                  child: FloatingActionButton.large(
                     child: Icon(Icons.search),
                     onPressed: () {
                       showModalBottomSheet(
