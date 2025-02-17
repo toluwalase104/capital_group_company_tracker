@@ -1,6 +1,9 @@
 # Company Interest Tracker
 
-A Flutter based application that allows a user to maintain a list of companies that they are interested in.
+A Flutter-based application that allows a user to maintain a list of companies that they are interested in.
+
+The app can be accessed by visiting the site:
+https://company-interest-tracker.web.app/
 
 ## Overview
 
