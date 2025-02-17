@@ -1,8 +1,11 @@
+import 'package:company_interest_tracker/company_widget.dart';
 import 'package:company_interest_tracker/main.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+/* Class defining the widget that allows companies that we are interested in to
+   be listed on the homepage. */
 class CompanyList extends StatelessWidget {
   const CompanyList({super.key});
 
@@ -21,9 +24,11 @@ class CompanyList extends StatelessWidget {
     return ListView.builder(
       itemCount : appState.numberOfCompanies,
       itemBuilder: (context, index) {
+        String companyName = appState.getIthCompanyName(index);
+
         return Card(
             child : ListTile(
-              title : Text(appState.getIthCompany(index)),
+              title : Text(companyName),
               trailing : Row(
                 mainAxisSize : MainAxisSize.min,
                 children: [
@@ -35,23 +40,8 @@ class CompanyList extends StatelessWidget {
                       showModalBottomSheet<void>(
                         context: context,
                         builder: (BuildContext context) {
-                          return Container(
-                            color: Colors.amber,
-                            constraints: BoxConstraints(minHeight: 200, minWidth: 200),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  const Text('Modal BottomSheet'),
-                                  ElevatedButton(
-                                    child: const Text('Close BottomSheet'),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
+                          // We use exclamation mark as we know the company name must exist during operation
+                          return CompanyWidget( companyData : appState.getCompanyData(companyName)! );
                         },
                       );
                     },

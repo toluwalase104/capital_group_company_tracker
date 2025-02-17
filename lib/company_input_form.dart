@@ -2,7 +2,7 @@ import 'package:company_interest_tracker/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Defines the form widget
+/* Defines the textbar that is used to add company names to our list */
 class CompanyInputForm extends StatefulWidget {
   const CompanyInputForm({super.key});
 

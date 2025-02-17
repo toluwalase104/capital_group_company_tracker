@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:company_interest_tracker/company_data.dart';
+import 'package:company_interest_tracker/finance_data_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/* Stores the data related to the state of the app, e.g. the list of companies and data stored about them*/
 class MyAppState extends ChangeNotifier {
   List<String> _companyNames = [];
 
@@ -56,7 +58,7 @@ class MyAppState extends ChangeNotifier {
     }
 
     _companyNames.add(company);
-    _companyMap.putIfAbsent(company, () => CompanyData(company));
+    _companyMap.putIfAbsent(company, () => CompanyData(_numberOfCompanies, company));
 
     ++_numberOfCompanies;
 
@@ -93,7 +95,7 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  String getIthCompany(int i){
+  String getIthCompanyName(int i){
     if (i < 0 || i >= _numberOfCompanies){
       return "";
     }
@@ -103,6 +105,59 @@ class MyAppState extends ChangeNotifier {
 
   bool noCompaniesAdded(){
     return _companyNames.isEmpty;
+  }
+
+  CompanyData? getCompanyData(String companyName){
+    return _companyMap[companyName];
+  }
+
+  void updateIthCompany(int index, String companyName, {String? tickerSymbol, String? companyDetails}){
+    if (index < 0 || index >= numberOfCompanies){
+      return;
+    }
+  
+    String previousName = _companyNames[index];
+
+    // We establish the new company's data potentially
+    // uses existing data when company details have not been changed
+    // or have been left undefined
+    CompanyData newData = 
+      CompanyData(
+        index,
+        companyName,
+        tickerSymbol : tickerSymbol ?? _companyMap[previousName]!.tickerSymbol,
+        companyDetails : companyDetails ?? _companyMap[previousName]!.details
+      );
+
+    // Update the relevant company using the existing company details if need be
+
+    if (!_companyMap.containsKey(companyName)){
+      // Ensure that a company is not included twice in the list of company names
+      _companyNames[index] = companyName;
+      _companyMap.putIfAbsent(
+        companyName,
+        () => newData
+      );
+    } else {
+      _companyMap[companyName] = newData;
+
+      // Remove the previous company being editted
+      // This handles the case when we edit the name of a 
+      // company to that of an existing company
+      if (companyName != previousName){
+        removeIthCompany(index);
+      }
+    }
+
+    // Only remove the prior entry if it is not equal to the current 
+    if (companyName != previousName){
+      _companyMap.remove(previousName);
+    }
+
+    notifyListeners();
+    debugPrint("$_companyNames");
+    debugPrint("$_companyMap");
+    debugPrint("$_numberOfCompanies");
   }
 
 }
@@ -123,6 +178,23 @@ class HomePage extends StatelessWidget {
                 const Expanded(
                   child: CompanyList()
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: FloatingActionButton(
+                    child: Icon(Icons.search),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context){
+                          return Container(
+                            constraints : BoxConstraints(minHeight: 200, minWidth: 200),
+                            child : const Center(child: DTOSearch()),
+                          );
+                        }
+                      );
+                    }
+                  ),
+                )
               ],
             ),
           );
